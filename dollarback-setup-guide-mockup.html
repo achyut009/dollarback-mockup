@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DollarBack — Setup wholesale cashback</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f3f1;
+    margin: 0;
+    padding: 40px 16px;
+    color: #1a1a1a;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #e3e1dc;
+    border-radius: 12px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e3e1dc;
+  }
+  .card-header p.title { font-weight: 500; font-size: 15px; margin: 0 0 4px; }
+  .card-header p.sub { font-size: 13px; color: #6b6a66; margin: 0; }
+  .close { font-size: 16px; color: #9b9a95; cursor: pointer; }
+
+  .row { border-top: 1px solid #e3e1dc; padding: 14px 20px; }
+  .row-head { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .row-head-left { display: flex; align-items: center; gap: 10px; }
+  .row-head-left span { font-size: 14px; }
+  .icon-done { color: #2f7d4f; font-size: 18px; }
+  .icon-open { color: #9b9a95; font-size: 18px; }
+  .chevron { font-size: 14px; color: #9b9a95; transition: transform 0.2s; }
+  .chevron.rotated { transform: rotate(180deg); }
+  .row-body { margin-top: 14px; display: none; }
+  .row-body.open { display: block; }
+
+  label { font-size: 13px; color: #6b6a66; display: block; margin-bottom: 4px; }
+  input[type="text"], select {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #d3d1cb;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 2px;
+    background: #fff;
+  }
+  .hint { font-size: 12px; color: #9b9a95; margin: 0 0 12px; }
+  .hint.warn { color: #a86b1f; }
+  button {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #d3d1cb;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { background: #f4f3f1; }
+
+  .flex { display: flex; gap: 16px; align-items: flex-start; }
+  .flex-1 { flex: 1; }
+  .tag-row { display: flex; gap: 8px; margin-bottom: 2px; }
+  .tag-row input { flex: 1; }
+
+  .preview-col { width: 170px; }
+  .preview-box {
+    background: #f4f3f1;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .preview-box p.label { font-size: 11px; color: #9b9a95; margin: 0 0 6px; }
+  .preview-box p.text { font-size: 13px; margin: 0; }
+  .preview-icon {
+    height: 80px;
+    background: #eeedfe;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+  }
+
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; }
+  .toggle-row + .toggle-row { margin-top: 10px; }
+  a.link { font-size: 14px; color: #185fa5; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <p class="title">Set up cashback rewards</p>
+      <p class="sub">0 of 5 steps completed &middot; about four minutes</p>
+    </div>
+    <span class="close">&times;</span>
+  </div>
+
+  <div id="steps"></div>
+</div>
+
+<script>
+const steps = [
+  { title: "Store setup finished", done: true },
+  {
+    title: "Create your first cashback rule",
+    open: true,
+    body: `
+      <div class="flex">
+        <div class="flex-1">
+          <label>Title</label>
+          <input type="text" placeholder="e.g. Black Friday cashback">
+          <p class="hint">Shown to customers at checkout.</p>
+
+          <label>Applies to</label>
+          <select><option>All products</option><option>Specific collections</option></select>
+          <p class="hint">Leave as All products, no selection needed.</p>
+
+          <label>Include/exclude customer tags</label>
+          <div class="tag-row">
+            <input type="text" placeholder="Include tags">
+            <input type="text" placeholder="Exclude tags">
+          </div>
+          <p class="hint">Leave blank to apply to all customers.</p>
+
+          <label>Percentage</label>
+          <input type="text" value="5">
+          <p class="hint" style="margin-bottom:12px;"></p>
+
+          <label>Credit expires (days)</label>
+          <input type="text" placeholder="90">
+          <p class="hint warn">Setting an expiry encourages faster redemption. 0 = never expires.</p>
+
+          <button>Create rule</button>
+        </div>
+        <div class="preview-col">
+          <div class="preview-box">
+            <p class="label">Customer preview</p>
+            <p class="text">Get <b>5% back</b> in store credit on this order</p>
+          </div>
+          <div class="preview-icon">🎁</div>
+        </div>
+      </div>
+    `
+  },
+  {
+    title: "Turn the rule on",
+    body: `
+      <div class="toggle-row">
+        <p style="font-size:13px; color:#6b6a66; margin:0;">Customers will start earning immediately once enabled.</p>
+        <button>Enable</button>
+      </div>
+    `
+  },
+  {
+    title: "Show it on your storefront",
+    body: `
+      <div class="toggle-row"><span style="font-size:14px;">Product page cashback</span><button>Enable</button></div>
+      <div class="toggle-row"><span style="font-size:14px;">Cart page cashback</span><button>Enable</button></div>
+    `
+  },
+  {
+    title: "Preview a customer's cashback",
+    body: `<a href="#" class="link">View on storefront &#8599;</a>`
+  }
+];
+
+const container = document.getElementById('steps');
+steps.forEach((s) => {
+  const row = document.createElement('div');
+  row.className = 'row';
+  const icon = s.done
+    ? '<span class="icon-done">&#10003;</span>'
+    : '<span class="icon-open">&#9675;</span>';
+  let html = `
+    <div class="row-head">
+      <div class="row-head-left">${icon}<span>${s.title}</span></div>
+      ${s.body ? '<span class="chevron' + (s.open ? ' rotated' : '') + '">&#9660;</span>' : ''}
+    </div>`;
+  if (s.body) {
+    html += `<div class="row-body${s.open ? ' open' : ''}">${s.body}</div>`;
+  }
+  row.innerHTML = html;
+  if (s.body) {
+    const head = row.querySelector('.row-head');
+    const body = row.querySelector('.row-body');
+    const chevron = row.querySelector('.chevron');
+    head.addEventListener('click', () => {
+      body.classList.toggle('open');
+      chevron.classList.toggle('rotated');
+    });
+  }
+  container.appendChild(row);
+});
+</script>
+
+</body>
+</html>
